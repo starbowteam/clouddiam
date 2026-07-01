@@ -1,1 +1,22 @@
-
+{
+    "name": "Diamond Cloud",
+    "short_name": "Diamond Cloud",
+    "description": "Персональное облако в экосистеме Diamond",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0a14",
+    "theme_color": "#0a0a14",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/assets/logo-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/logo-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
