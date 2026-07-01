@@ -1,1 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Diamond Cloud</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0a14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Diamond Cloud">
+    <link rel="apple-touch-icon" href="/assets/logo-512.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css?v=1">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="smooth-loader-overlay" id="smoothLoader">
+        <img src="/assets/favicon.ico" class="smooth-loader-logo" alt="Diamond Cloud">
+        <div class="smooth-loader-spinner"><i class="fas fa-circle-notch"></i></div>
+    </div>
 
+    <canvas id="particleCanvas" class="particle-bg"></canvas>
+
+    <div class="app-shell" id="appShell">
+        <nav class="sidebar" id="sidebar">
+            <a class="sidebar-icon active" href="#home" data-page="home"><i class="fas fa-cloud"></i></a>
+            <a class="sidebar-icon" href="#files" data-page="files"><i class="fas fa-folder"></i></a>
+            <a class="sidebar-icon" href="#shared" data-page="shared"><i class="fas fa-share-alt"></i></a>
+            <a class="sidebar-icon" href="#stats" data-page="stats"><i class="fas fa-chart-bar"></i></a>
+            <a class="sidebar-icon" href="https://diamkey.ru" target="_blank"><i class="fas fa-key"></i></a>
+            <div class="sidebar-bottom">
+                <a class="sidebar-icon" id="plusBtn" href="https://diamkey.ru/diamond-plus" target="_blank" title="Активировать Diamond Plus"><i class="fas fa-crown"></i></a>
+                <button class="sidebar-icon" id="logoutSidebarBtn"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </nav>
+
+        <main class="main-content" id="mainContent">
+            <section class="page active" id="page-home">
+                <div class="hero-panel glass-panel">
+                    <div class="hero-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <h1>Diamond Cloud</h1>
+                    <p class="hero-subtitle">Ваше персональное облако в экосистеме Diamond</p>
+                    <div class="hero-stats-row" id="heroStats">
+                        <div class="hero-stat"><span class="number">—</span> файлов</div>
+                        <div class="hero-stat"><span class="number">—</span> папок</div>
+                    </div>
+                    <div class="storage-progress-container glass-panel-inner">
+                        <div class="storage-info">
+                            <span>Занято <strong id="storageUsed">0 Б</strong> из <strong id="storageLimit">15 ГБ</strong></span>
+                            <span id="storagePercent">0%</span>
+                        </div>
+                        <div class="storage-bar">
+                            <div class="storage-fill" id="storageFill"></div>
+                        </div>
+                        <div class="storage-plan-badge">Free</div>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" id="uploadBtn"><i class="fas fa-upload"></i> Загрузить файл</button>
+                        <button class="btn" id="createFolderBtn"><i class="fas fa-folder-plus"></i> Создать папку</button>
+                    </div>
+                    <input type="file" id="fileInput" multiple style="display:none;">
+                </div>
+
+                <div class="glass-panel quick-actions-panel">
+                    <h2><i class="fas fa-bolt"></i> Быстрые действия</h2>
+                    <div class="quick-actions-grid">
+                        <div class="quick-action-card" data-action="upload"><i class="fas fa-cloud-upload-alt"></i><span>Загрузить</span></div>
+                        <div class="quick-action-card" data-action="folder"><i class="fas fa-folder-plus"></i><span>Папка</span></div>
+                        <div class="quick-action-card" data-action="share"><i class="fas fa-link"></i><span>Поделиться</span></div>
+                        <div class="quick-action-card" data-action="search"><i class="fas fa-search"></i><span>Поиск</span></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel recent-panel" id="recentPanel">
+                    <h2><i class="fas fa-clock"></i> Недавние файлы</h2>
+                    <div id="recentFilesList">
+                        <p class="text-muted">Нет недавних файлов</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel traffic-panel">
+                    <h2><i class="fas fa-exchange-alt"></i> Трафик за месяц</h2>
+                    <div class="traffic-stats">
+                        <div class="traffic-stat"><span class="number" id="trafficUsed">0 МБ</span> использовано</div>
+                        <div class="traffic-stat"><span class="number">∞</span> доступно</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="page-files">
+                <div class="glass-panel">
+                    <div class="files-header">
+                        <h2><i class="fas fa-folder-open"></i> Мои файлы</h2>
+                        <div class="files-search">
+                            <input type="text" id="filesSearch" placeholder="Поиск...">
+                            <button class="btn btn-icon"><i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
+                    <div class="files-toolbar">
+                        <button class="btn" id="uploadBtn2"><i class="fas fa-upload"></i> Загрузить</button>
+                        <button class="btn" id="createFolderBtn2"><i class="fas fa-folder-plus"></i> Папка</button>
+                        <div class="sort-container">
+                            <span class="text-muted">Сортировка:</span>
+                            <button class="sort-btn active" data-sort="name">По имени</button>
+                            <button class="sort-btn" data-sort="date">По дате</button>
+                            <button class="sort-btn" data-sort="size">По размеру</button>
+                        </div>
+                    </div>
+                    <div class="files-breadcrumbs" id="breadcrumbs">
+                        <span class="breadcrumb active" data-folder="root"><i class="fas fa-home"></i> Главная</span>
+                    </div>
+                    <div class="files-list" id="filesList">
+                        <p class="text-muted">Загрузка...</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="page-shared">
+                <div class="glass-panel">
+                    <h2><i class="fas fa-share-alt"></i> Публичные ссылки</h2>
+                    <p class="text-muted">Файлы, которыми вы поделились</p>
+                    <div id="sharedFilesList">
+                        <p class="text-muted">Нет опубликованных файлов</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="page-stats">
+                <div class="glass-panel">
+                    <h2><i class="fas fa-chart-bar"></i> Статистика</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-folder"></i></div>
+                            <div class="stat-value" id="statFolders">0</div>
+                            <div class="stat-label">Папок</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-file"></i></div>
+                            <div class="stat-value" id="statFiles">0</div>
+                            <div class="stat-label">Файлов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-hdd"></i></div>
+                            <div class="stat-value" id="statStorage">0 Б</div>
+                            <div class="stat-label">Занято</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-download"></i></div>
+                            <div class="stat-value" id="statDownloads">0</div>
+                            <div class="stat-label">Скачиваний</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="shareModal">
+        <div class="modal-content glass-panel" onclick="event.stopPropagation()">
+            <h3><i class="fas fa-link"></i> Публичная ссылка</h3>
+            <div class="share-link-container">
+                <input type="text" id="shareLinkInput" readonly>
+                <button class="btn btn-primary" id="copyShareLink"><i class="fas fa-copy"></i> Копировать</button>
+            </div>
+            <button class="btn" onclick="closeModal('shareModal')">Закрыть</button>
+        </div>
+    </div>
+
+    <div class="modal" id="folderModal">
+        <div class="modal-content glass-panel" onclick="event.stopPropagation()">
+            <h3 id="folderModalTitle"><i class="fas fa-folder-plus"></i> Новая папка</h3>
+            <input type="text" id="folderNameInput" placeholder="Название папки">
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button class="btn btn-primary" id="saveFolderBtn"><i class="fas fa-check"></i> Сохранить</button>
+                <button class="btn" onclick="closeModal('folderModal')">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="upload-progress-panel glass-panel" id="uploadProgressPanel" style="display:none;">
+        <div class="upload-progress-header">
+            <span>Загрузка...</span>
+            <button class="btn btn-icon" id="closeUploadProgress"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="uploadProgressList"></div>
+    </div>
+
+    <script src="/js/cloud-core.js?v=1"></script>
+    <script src="/js/cloud-auth.js?v=1"></script>
+    <script src="/js/cloud-ui.js?v=1"></script>
+    <script src="/js/cloud-files.js?v=1"></script>
+    <script src="/js/cloud-share.js?v=1"></script>
+</body>
+</html>
